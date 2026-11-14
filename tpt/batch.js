@@ -20,7 +20,7 @@ window.__batch = (async () => {
       const problems = [...res.log];
       if (res.std.filter((x) => x.startsWith('CCSS.')).length !== D.ccss.length) problems.push('std ' + res.std.join(','));
       if (res.grades.length !== D.grades.length) problems.push('grades ' + res.grades.join(','));
-      for (const id of ['ItemDigitalProduct', 'ItemDigitalThumb1', 'ItemDigitalThumb2', 'ItemDigitalThumb3', 'ItemDigitalThumb4']) if (!hv(id)) problems.push('upload ' + id);
+      for (const id of ['ItemDigitalProduct', 'ItemDigitalThumb1', 'ItemDigitalThumb2', 'ItemDigitalThumb3', 'ItemDigitalThumb4']) if (!/upload-finished/.test(doc.querySelector(`input[type=file]#${id}`).closest('div').className)) problems.push('upload ' + id);
       if (!doc.querySelector('.LexicalEditor__content').innerText.trim()) problems.push('desc');
       if (res.active !== 'false') problems.push('active');
       if (problems.length) { window.__blog.push({ sk: SK, ok: false, problems }); window.__queue.shift(); save(); continue; }

@@ -26,7 +26,7 @@ window.__edit = (async () => {
       const problems = [];
       if (/Creative Sprout Learning|matches a game/i.test(txt)) problems.push('old desc');
       if (!txt.startsWith('📚')) problems.push('desc start: ' + txt.slice(0, 40));
-      for (const x of ['ItemDigitalProduct', 'ItemDigitalPreview', 'ItemDigitalThumb1', 'ItemDigitalThumb2', 'ItemDigitalThumb3', 'ItemDigitalThumb4']) if (!hv(x)) problems.push('upload ' + x);
+      for (const x of ['ItemDigitalProduct', 'ItemDigitalPreview', 'ItemDigitalThumb1', 'ItemDigitalThumb2', 'ItemDigitalThumb3', 'ItemDigitalThumb4']) if (!/upload-finished/.test(doc.querySelector(`input[type=file]#${x}`).closest('div').className)) problems.push('upload ' + x);
       const act = doc.getElementById('makeProductActive'); if (act && act.getAttribute('aria-checked') === 'true') act.click();
       if (problems.length) { window.__elog.push({ id, sk, ok: false, problems }); continue; }
       const nav = new Promise((r) => { f.onload = () => r(true); setTimeout(() => r(false), 60000); });
