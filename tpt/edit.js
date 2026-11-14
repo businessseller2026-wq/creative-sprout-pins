@@ -14,7 +14,8 @@ window.__edit = (async () => {
       if (title !== D.title) { window.__elog.push({ id, sk, ok: false, why: 'title mismatch: ' + title }); continue; }
       const setFile = async (sel, url, name, type) => { const r = await fetch(url); if (!r.ok) throw new Error(url + ' ' + r.status); const b = await r.blob(); const dt = new w.DataTransfer(); dt.items.add(new w.File([b], name, { type })); const i = doc.querySelector(sel); i.files = dt.files; i.dispatchEvent(new w.Event('change', { bubbles: true })); await sleep(2500); };
       const base = `https://learn.creativesproutdesigns.com/api/kit/${sk}?k=${K}`;
-      await setFile('input[type=file]#ItemDigitalProduct', base, D.pdfName, 'application/pdf');
+      const del = doc.querySelector('#upload-product .delete-btn'); if (del) { del.click(); await sleep(1500); }
+      await setFile('input[type=file]#ItemDigitalProduct', base, D.pdfName, 'application/pdf'); await sleep(3000);
       await setFile('input[type=file]#ItemDigitalPreview', base + '&preview=1', D.previewName, 'application/pdf');
       doc.getElementById('ItemGenerateThumbnail2').click(); await sleep(600);
       for (let i = 0; i < 4; i++) await setFile(`input[type=file]#ItemDigitalThumb${i + 1}`, D.imgs[i], sk + '-tpt-' + (i + 1) + '.jpg', 'image/jpeg');
@@ -24,6 +25,7 @@ window.__edit = (async () => {
       ed.dispatchEvent(new w.ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true })); await sleep(800);
       const txt = ed.innerText; const hv = (x) => (doc.querySelector(`input[type=hidden]#${x}`) || {}).value || '';
       const problems = [];
+      if (!hv('ItemDigitalProduct')) problems.push('product not replaced');
       if (/Creative Sprout Learning|matches a game/i.test(txt)) problems.push('old desc');
       if (!txt.startsWith('📚')) problems.push('desc start: ' + txt.slice(0, 40));
       for (const x of ['ItemDigitalProduct', 'ItemDigitalPreview', 'ItemDigitalThumb1', 'ItemDigitalThumb2', 'ItemDigitalThumb3', 'ItemDigitalThumb4']) if (!/upload-finished/.test(doc.querySelector(`input[type=file]#${x}`).closest('div').className)) problems.push('upload ' + x);
