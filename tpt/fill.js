@@ -28,11 +28,13 @@ if (D.ccss.length) {
   leafBtn('Select CCSS').click(); await sleep(1200);
   const setSel = (el, v) => { Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').set.call(el, v); el.dispatchEvent(new Event('change', { bubbles: true })); };
   for (const code of D.ccss) {
-    const math = !/^(RF|RL|RI|L|W|SL)\./.test(code); const tb = [...document.querySelectorAll('button')].filter((b) => b.innerText.trim() === (math ? 'Math' : 'ELA')).pop(); tb.click(); await sleep(700);
+    const math = !/^(RF|RL|RI|L|W|SL)\./.test(code); const tb = [...document.querySelectorAll('button[role=tab]')].filter((b) => b.innerText.trim() === (math ? 'Math' : 'ELA')).pop(); if (tb.getAttribute('aria-selected') !== 'true') { tb.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerType: 'mouse' })); tb.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 })); tb.click(); await sleep(1000); }
     const gr = code.match(/(?:^|\.)([K12])\./)[1]; const gs = document.getElementById('ccssGradeSelect'); setSel(gs, gr === 'K' ? 'Kindergarten' : gr); await sleep(900);
     const as = document.getElementById('ccssAreaSelect'); let done = false;
     const pref = code.match(/^(RF|RL|RI|L|W|SL)\./)?.[1]; const AREA = { RF: 'Reading: Foundational Skills', RL: 'Reading: Literature', RI: 'Reading: Informational Text', L: 'Language', W: 'Writing', SL: 'Speaking & Listening' };
-    const order = [...as.options].sort((a, b) => (pref && a.text === AREA[pref] ? -1 : 0) - (pref && b.text === AREA[pref] ? -1 : 0));
+    const MAREA = { CC: 'Counting and Cardinality', G: 'Geometry', MD: 'Measurement and Data', NBT: 'Number and Operations in Base Ten', OA: 'Operations and Algebraic Thinking', NF: 'Number and Operations—Fractions' };
+    const md = code.match(/^[K12]\.([A-Z]+)\./)?.[1]; if (md) AREA.M = MAREA[md];
+    const order = [...as.options].sort((a, b) => (a.text === AREA[pref || 'M'] ? -1 : 0) - (b.text === AREA[pref || 'M'] ? -1 : 0));
     for (const opt of order) { if (/Anchor/.test(opt.text)) continue; setSel(as, opt.value); await sleep(900);
       const row = [...document.querySelectorAll('.EducationStandardsTerminalRow')].find((r) => r.querySelector('.EducationStandardsTerminalRow__labelTitle')?.textContent.trim() === code);
       if (row) { const cb = row.querySelector('input'); if (!cb.checked) cb.click(); await sleep(250); done = true; break; } }
