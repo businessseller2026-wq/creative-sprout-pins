@@ -1,7 +1,8 @@
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = [];
 const setInput = (el, v) => { Object.getOwnPropertyDescriptor(Object.getPrototypeOf(el), 'value').set.call(el, v); el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); el.dispatchEvent(new Event('blur', { bubbles: true })); };
-const setFile = async (sel, url, name, type) => { const r = await fetch(url); if (!r.ok) throw new Error('fetch ' + url + ' ' + r.status); const b = await r.blob(); const dt = new DataTransfer(); dt.items.add(new File([b], name, { type })); const i = document.querySelector(sel); i.files = dt.files; i.dispatchEvent(new Event('change', { bubbles: true })); };
+const setFile = async (sel, url, name, type) => { const r = await fetch(url); if (!r.ok) throw new Error('fetch ' + url + ' ' + r.status); const b = await r.blob(); const dt = new DataTransfer(); dt.items.add(new File([b], name, { type })); const i = document.querySelector(sel); i.files = dt.files; i.dispatchEvent(new Event('change', { bubbles: true }));
+  const id = sel.match(/#(\w+)/)[1]; for (let k = 0; k < 120; k++) { await sleep(1000); if ((document.querySelector(`input[type=hidden]#${id}`) || {}).value) return; } log.push('slow upload ' + id); };
 const leafBtn = (txt, root = document) => [...root.querySelectorAll('button')].find((b) => b.innerText.trim() === txt);
 const pickSelect = async (toggleSel, optText) => { const t = document.querySelector(toggleSel); t.click(); await sleep(500); const o = [...document.querySelectorAll('[role=option]')].find((x) => x.textContent.trim() === optText); if (!o) { log.push('no option ' + optText); return; } o.click(); await sleep(300); };
 const reactSelect = async (id, values) => { const inp = document.getElementById(id); for (const v of values) { inp.focus(); setInput(inp, v); await sleep(700); const o = [...document.querySelectorAll('.Select__menu [role=option]')].find((x) => x.textContent.trim() === v && x.getAttribute('aria-disabled') !== 'true'); if (o) { o.click(); await sleep(300); } else log.push(id + ' missing ' + v); } inp.blur(); };
@@ -11,7 +12,7 @@ setInput(document.getElementById('ItemName'), D.title);
 await setFile('input[type=file]#ItemDigitalProduct', D.pdf, D.pdfName, 'application/pdf');
 if (D.previewPdf) await setFile('input[type=file]#ItemDigitalPreview', D.previewPdf, D.previewName, 'application/pdf');
 document.getElementById('ItemGenerateThumbnail2').click(); await sleep(600);
-for (let i = 0; i < D.imgs.length; i++) { await setFile(`input[type=file]#ItemDigitalThumb${i + 1}`, D.imgs[i], D.slug + '-' + (i + 1) + '.jpg', 'image/jpeg'); await sleep(1200); }
+for (let i = 0; i < D.imgs.length; i++) await setFile(`input[type=file]#ItemDigitalThumb${i + 1}`, D.imgs[i], D.slug + '-' + (i + 1) + '.jpg', 'image/jpeg');
 // 3 description
 { const ed = document.querySelector('.LexicalEditor__content'); ed.focus(); const dt = new DataTransfer(); dt.setData('text/html', D.desc); dt.setData('text/plain', D.desc.replace(/<[^>]+>/g, '\n')); ed.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true })); await sleep(400); }
 // 4 price
