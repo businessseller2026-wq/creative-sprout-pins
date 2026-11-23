@@ -13,14 +13,14 @@ const done = (id) => /upload-finished/.test((doc.querySelector(`input[type=file]
 const setFile = async (id, blob, name, type) => {
   const dt = new w.DataTransfer(); dt.items.add(new w.File([blob], name, { type }));
   const i = doc.querySelector(`input[type=file]#${id}`); i.files = dt.files; i.dispatchEvent(new w.Event('change', { bubbles: true }));
-  for (let k = 0; k < 150; k++) { await sleep(1000); if (done(id)) return; } log.push('slow upload ' + id);
+  for (let k = 0; k < 90; k++) { await sleep(1000); if (done(id)) return; } log.push('slow upload ' + id);
 };
 const reactSelect = async (id, values) => { const inp = doc.getElementById(id); for (const v of values) { inp.focus(); setInput(inp, v); await sleep(900); const o = [...doc.querySelectorAll('.Select__menu [role=option]')].find((x) => x.textContent.trim() === v && x.getAttribute('aria-disabled') !== 'true'); if (o) { o.click(); await sleep(400); } else log.push(id + ' missing ' + v); } inp.blur(); };
 // title
 setInput(doc.getElementById('ItemName'), D.title);
 // product file
 const pdf = await getPdf(); if (pdf.size < 100000) log.push('pdf small ' + pdf.size);
-await setFile('ItemDigitalProduct', pdf, D.pdfName, 'application/pdf');
+await setFile('ItemDigitalProduct', pdf, D.pdfName.replace(' - TPT & Etsy', ''), 'application/pdf'); // '&' in the name is refused (403)
 // thumbnails: "Upload thumbnails now"
 doc.getElementById('ItemGenerateThumbnail2').click(); await sleep(800);
 for (let i = 0; i < 4; i++) { const b = await (await fetch(BASE + D.thumbs[i], { cache: 'no-store' })).blob(); await setFile('ItemDigitalThumb' + (i + 1), b, D.thumbs[i], 'image/png'); }
