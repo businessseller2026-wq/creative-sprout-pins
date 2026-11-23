@@ -33,7 +33,7 @@ setInput(doc.getElementById('item-price'), D.price); setInput(doc.getElementById
 // grades
 for (const g of D.grades) { const b = doc.getElementById('data.Grade.Grade-checkbox_' + g.toLowerCase().replace(/ /g, '-')); if (!b) { log.push('no grade ' + g); continue; } if (b.getAttribute('aria-checked') !== 'true') b.click(); await sleep(150); }
 // subject, tag, format
-await reactSelect('subject-areas', D.subjects); await reactSelect('tags', D.tags); await reactSelect('formats', ['PDF']);
+await reactSelect('subject-areas', D.subjects); await reactSelect('tags', D.tags);
 doc.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await sleep(300);
 // CCSS (all math, kindergarten)
 {
