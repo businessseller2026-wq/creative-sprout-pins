@@ -19,8 +19,7 @@ const reactSelect = async (id, values) => { const inp = doc.getElementById(id); 
 // title
 setInput(doc.getElementById('ItemName'), D.title);
 // thumbnails: "Upload thumbnails now"
-doc.getElementById('ItemGenerateThumbnail2').click(); await sleep(800);
-for (let i = 0; i < D.thumbs.length; i++) { const b = await (await fetch(BASE + D.thumbs[i], { cache: 'no-store' })).blob(); await setFile('ItemDigitalThumb' + (i + 1), b, D.thumbs[i], 'image/png'); }
+doc.getElementById('ItemGenerateThumbnail3').click(); await sleep(500);
 // description
 { const ed = doc.querySelector('.LexicalEditor__content'); ed.focus(); const dt = new w.DataTransfer(); dt.setData('text/html', D.desc); dt.setData('text/plain', D.desc.replace(/<[^>]+>/g, '\n')); ed.dispatchEvent(new w.ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true })); await sleep(600); }
 // price (license price matches Turkey: 10% off)
@@ -60,7 +59,6 @@ const std = t.slice(i + 28, t.indexOf('Select CCSS', i)).trim().split('\n').filt
 if (std.length !== D.ccss.length) problems.push('std ' + std.join(','));
 const grades = [...doc.querySelectorAll('button[id^="data.Grade"][aria-checked=true]')].map((b) => b.id.split('_')[1]);
 if (grades.length !== D.grades.length) problems.push('grades ' + grades.join(','));
-for (const id of ['ItemDigitalThumb1', 'ItemDigitalThumb2']) if (!hv(id)) problems.push('upload ' + id);
 if (!doc.querySelector('.LexicalEditor__content').innerText.trim()) problems.push('desc');
 if (doc.getElementById('makeProductActive').getAttribute('aria-checked') !== 'false') problems.push('active');
 const cr = doc.querySelector('input[name="data[ItemsProperty][copyright_declaration]"]:checked');
